@@ -20,6 +20,7 @@ import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
+import org.openide.windows.TopComponent;
 
 public class CommandUtils {
 
