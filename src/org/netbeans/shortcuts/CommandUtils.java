@@ -20,6 +20,7 @@ import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
+import org.openide.filesystems.FileUtil;
 import org.openide.windows.TopComponent;
 
 public class CommandUtils {
@@ -49,17 +50,15 @@ public class CommandUtils {
 
     public static String parse(String cmd) {
         DataObject dobj = Utilities.actionsGlobalContext().lookup(DataObject.class);
-        
-        
-        if ( dobj == null )
-        {
+
+
+        if (dobj == null) {
             Node[] activedNodes = TopComponent.getRegistry().getActivated().getActivatedNodes();
-            if ( activedNodes.length > 0 )
-            {
+            if (activedNodes.length > 0) {
                 dobj = activedNodes[0].getLookup().lookup(DataObject.class);
             }
         }
-        
+
         Collection<? extends Node> nodez = Utilities.actionsGlobalContext().lookup(new Lookup.Template<Node>(Node.class)).allInstances();
         Node[] nodes = nodez.toArray(new Node[nodez.size()]);
         Pattern pVar = Pattern.compile("#\\{([a-zA-Z]+[0-9]*)\\}");
@@ -94,7 +93,12 @@ public class CommandUtils {
                     } else if (("filenameext" + index).equalsIgnoreCase(var)) {
                         cmd = cmd.replace("#{" + var + "}", fo.getNameExt());
                     } else if (("folder" + index).equalsIgnoreCase(var)) {
-                        String folder = normalize(fo.getParent().getPath());
+                        String folder;
+                        if (fo.isFolder()) {
+                            folder = normalize(fo.getPath());
+                        } else {
+                            folder = normalize(fo.getParent().getPath());
+                        }
                         cmd = cmd.replace("#{" + var + "}", folder);
                     } else if (("foldername" + index).equalsIgnoreCase(var)) {
                         cmd = cmd.replace("#{" + var + "}", fo.getParent().getName());
