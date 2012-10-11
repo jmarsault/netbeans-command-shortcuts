@@ -1,6 +1,8 @@
 package org.netbeans.shortcuts;
 
+import java.awt.Component;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +22,6 @@ import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
-import org.openide.filesystems.FileUtil;
 import org.openide.windows.TopComponent;
 
 public class CommandUtils {
@@ -50,15 +51,17 @@ public class CommandUtils {
 
     public static String parse(String cmd) {
         DataObject dobj = Utilities.actionsGlobalContext().lookup(DataObject.class);
+        TopComponent activated = TopComponent.getRegistry().getActivated();
 
+        if (dobj == null && TopComponent.getRegistry().getActivated() != null) {
 
-        if (dobj == null) {
-            Node[] activedNodes = TopComponent.getRegistry().getActivated().getActivatedNodes();
-            if (activedNodes.length > 0) {
-                dobj = activedNodes[0].getLookup().lookup(DataObject.class);
+            if (TopComponent.getRegistry().getActivated() != null) {
+                Node[] activedNodes = activated.getActivatedNodes();
+                if (activedNodes != null && activedNodes.length > 0) {
+                    dobj = activedNodes[0].getLookup().lookup(DataObject.class);
+                }
             }
         }
-
         Collection<? extends Node> nodez = Utilities.actionsGlobalContext().lookup(new Lookup.Template<Node>(Node.class)).allInstances();
         Node[] nodes = nodez.toArray(new Node[nodez.size()]);
         Pattern pVar = Pattern.compile("#\\{([a-zA-Z]+[0-9]*)\\}");
@@ -110,6 +113,7 @@ public class CommandUtils {
                             String selection = comp.getSelectedText();
                             if (selection != null) {
                                 cmd = cmd.replace("#{" + var + "}", selection);
+                            } else {
                             }
                         }
                     }
@@ -142,9 +146,56 @@ public class CommandUtils {
             } else if (("mainproject").equalsIgnoreCase(var)) {
                 String projectPath = normalize(OpenProjects.getDefault().getMainProject().getProjectDirectory().getPath());
                 cmd = cmd.replace("#{" + var + "}", projectPath);
-            }
+            } else if (("selection").equalsIgnoreCase(var)) {
+                Component[] components = activated.getComponents();
+                for (Component component : components) {
+                    if (component.getClass().getName().contains("OutputTab")) {
+                        try {
+                            //Hack
+                            ClassLoader l = Thread.currentThread().getContextClassLoader();
+                            Class outputTabClass = l.loadClass("org.netbeans.core.output2.OutputTab");
+                            Method getOutputPane = outputTabClass.getMethod("getOutputPane");
+                            Object abstractOutputPaneClass = (Object) getOutputPane.invoke(component);
 
+                            Method getSelectedText = abstractOutputPaneClass.getClass().getMethod("getSelectedText");
+                            String selection = (String) getSelectedText.invoke(abstractOutputPaneClass);
+
+                            if (selection != null) {
+                                cmd = cmd.replace("#{" + var + "}", selection);
+                            }
+                        } catch (Exception ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+
+                    }
+                }
+            } else if (("file").equalsIgnoreCase(var)) {
+//                    Component[] components = activated.getComponents();
+//                    for (Component component : components) {
+//                        if (component.getClass().getName().contains("OutputTab")) {
+//                            try {
+//                                //Hack
+//                                ClassLoader l = Thread.currentThread().getContextClassLoader();
+//                                Class outputTabClass = l.loadClass("org.netbeans.core.output2.OutputTab");
+//                                Method getOutputPane = outputTabClass.getMethod("getOutputPane");
+//                                Object abstractOutputPaneClass = (Object) getOutputPane.invoke(component);
+//                                
+//                                Method getSelectedText = abstractOutputPaneClass.getClass().getMethod("getSelectedText");
+//                                String selection = (String) getSelectedText.invoke(abstractOutputPaneClass);
+//                                Document doc;
+//                                doc.
+//                                if (selection != null) {
+//                                    cmd = cmd.replace("#{" + var + "}", selection);
+//                                }
+//                            } catch (Exception ex) {
+//                                Exceptions.printStackTrace(ex);
+//                            }
+//
+//                        }
+//                    }
+            }
         }
+
 
         if (Utilities.isWindows()) {
             cmd = "cmd.exe /C " + cmd;
