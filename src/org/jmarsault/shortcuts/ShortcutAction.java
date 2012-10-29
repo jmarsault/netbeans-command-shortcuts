@@ -32,8 +32,8 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
     private JPopupMenu popup;
     private final FileSystemView fileSystemView;
     private final ShortcutSettings settings;
-    private final Icon ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/shortcuts/shortcut24.png"));
-    private final Icon ICON_SMALL = new ImageIcon(ImageUtilities.loadImage("org/netbeans/shortcuts/shortcut16.png"));
+    private final Icon ICON = new ImageIcon(ImageUtilities.loadImage("org/jmarsault/shortcuts/shortcut24.png"));
+    private final Icon ICON_SMALL = new ImageIcon(ImageUtilities.loadImage("org/jmarsault/shortcuts/shortcut16.png"));
 
     public ShortcutAction() {
         settings = ShortcutSettings.getDefault();
@@ -56,7 +56,6 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
         JButton btnExecute = new JButton(NbBundle.getMessage(ShortcutAction.class, "RunPanel.btnRun.text"));
         Mnemonics.setLocalizedText(btnExecute, org.openide.util.NbBundle.getMessage(RunPanel.class, "RunPanel.btnRun.text"));
         btnExecute.addActionListener(new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 shortcutPanel.executeActionPerformed();
@@ -67,7 +66,6 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
         JButton btnCancel = new JButton();
         Mnemonics.setLocalizedText(btnCancel, org.openide.util.NbBundle.getMessage(RunPanel.class, "RunPanel.btnCancel.text"));
         btnCancel.addActionListener(new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.getRootFrame().dispose();
@@ -77,7 +75,6 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
         JButton btnSave = new JButton();
         Mnemonics.setLocalizedText(btnSave, org.openide.util.NbBundle.getMessage(RunPanel.class, "RunPanel.btnSave.text"));
         btnSave.addActionListener(new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 shortcutPanel.saveActionPerformed();
@@ -120,7 +117,6 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
             menuItem.setActionCommand(shortcut.getValue());
             menuItem.setAccelerator(settings.getKeyStroke(shortcut.getKey()));
             menuItem.addActionListener(new ActionListener() {
-
                 @Override
                 public void actionPerformed(ActionEvent evt) {
                     JMenuItem menuItem = (JMenuItem) evt.getSource();
@@ -134,7 +130,6 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
         jComponent.add(new JSeparator());
         JMenuItem menuItem = new JMenuItem(NbBundle.getMessage(ShortcutAction.class, "lbl_option"));
         menuItem.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent evt) {
                 OptionsDisplayer.getDefault().open(OptionsDisplayer.ADVANCED + "/org.netbeans.shortcuts.options.Shortcut");
@@ -142,21 +137,20 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
         });
         jComponent.add(menuItem);
     }
-    
+
     private void addKeyStrokesTo(JButton btn) {
 
         for (final Map.Entry<String, String> shortcut : settings.getShortcuts().entrySet()) {
 
             btn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(settings.getKeyStroke(shortcut.getKey()), shortcut.getValue());
             btn.getActionMap().put(shortcut.getValue(), new AbstractAction() {
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     e.setSource(shortcut.getValue());
                     btnShortcutActionPerformed(e);
                 }
             });
-        }        
+        }
     }
 
     private void btnShortcutActionPerformed(ActionEvent evt) {
