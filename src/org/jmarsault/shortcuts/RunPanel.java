@@ -1,4 +1,4 @@
-package org.netbeans.shortcuts;
+package org.jmarsault.shortcuts;
 
 import java.io.File;
 import javax.swing.JComboBox;

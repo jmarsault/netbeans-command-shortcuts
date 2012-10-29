@@ -1,6 +1,6 @@
-package org.netbeans.shortcuts.options;
+package org.jmarsault.shortcuts.options;
 
-import org.netbeans.shortcuts.ShortcutSettings;
+import org.jmarsault.shortcuts.ShortcutSettings;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.KeyAdapter;

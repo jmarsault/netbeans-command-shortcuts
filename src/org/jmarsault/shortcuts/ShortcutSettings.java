@@ -1,4 +1,4 @@
-package org.netbeans.shortcuts;
+package org.jmarsault.shortcuts;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

@@ -1,4 +1,4 @@
-package org.netbeans.shortcuts;
+package org.jmarsault.shortcuts;
 
 import java.awt.Component;
 import java.awt.Image;

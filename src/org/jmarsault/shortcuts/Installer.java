@@ -1,4 +1,4 @@
-package org.netbeans.shortcuts;
+package org.jmarsault.shortcuts;
 
 import java.io.IOException;
 import org.openide.filesystems.FileObject;
