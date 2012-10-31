@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: org.netbeans.shortcuts
+OpenIDE-Module: org.jmarsault.shortcuts
 OpenIDE-Module-Implementation-Version: 4
 OpenIDE-Module-Install: org/jmarsault/shortcuts/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/jmarsault/shortcuts/Bundle.properties

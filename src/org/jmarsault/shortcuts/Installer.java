@@ -26,21 +26,21 @@ public class Installer extends ModuleInstall {
             try {
                 final FileObject actionsFolder = FileUtil.createFolder(fileType, "Actions");
 
-                final FileObject newAction = actionsFolder.getFileObject("org-netbeans-shortcuts-ShortcutAction.shadow");
+                final FileObject newAction = actionsFolder.getFileObject("org-jmarsault-shortcuts-ShortcutAction.shadow");
                 if (null == newAction) {
-                    final FileObject action = actionsFolder.createData("org-netbeans-shortcuts-ShortcutAction.shadow");
-                    action.setAttribute("originalFile", "Actions/File/org-netbeans-shortcuts-ShortcutAction.instance");
+                    final FileObject action = actionsFolder.createData("org-jmarsault-shortcuts-ShortcutAction.shadow");
+                    action.setAttribute("originalFile", "Actions/File/org-jmarsault-shortcuts-ShortcutAction.instance");
                     action.setAttribute("position", 2950);
                 }
-                final FileObject separatorBefore = actionsFolder.getFileObject("org-netbeans-shortcuts-ShortcutAction-separatorBefore.instance");
+                final FileObject separatorBefore = actionsFolder.getFileObject("org-jmarsault-shortcuts-ShortcutAction-separatorBefore.instance");
                 if (null == separatorBefore) {
-                    final FileObject action = actionsFolder.createData("org-netbeans-shortcuts-ShortcutAction-separatorBefore.instance");
+                    final FileObject action = actionsFolder.createData("org-jmarsault-shortcuts-ShortcutAction-separatorBefore.instance");
                     action.setAttribute("instanceClass", "javax.swing.JSeparator");
                     action.setAttribute("position", 2930);
                 }
-                final FileObject separatorafter = actionsFolder.getFileObject("org-netbeans-shortcuts-ShortcutAction-separatorAfter.instance");
+                final FileObject separatorafter = actionsFolder.getFileObject("org-jmarsault-shortcuts-ShortcutAction-separatorAfter.instance");
                 if (null == separatorafter) {
-                    final FileObject action = actionsFolder.createData("org-netbeans-shortcuts-ShortcutAction-separatorAfter.instance");
+                    final FileObject action = actionsFolder.createData("org-jmarsault-shortcuts-ShortcutAction-separatorAfter.instance");
                     action.setAttribute("instanceClass", "javax.swing.JSeparator");
                     action.setAttribute("position", 2970);
                 }
@@ -58,7 +58,7 @@ public class Installer extends ModuleInstall {
         protected void handleFileType(FileObject fileType) {
             try {
                 final FileObject actionsFolder = FileUtil.createFolder(fileType, "Actions");
-                final FileObject newAction = actionsFolder.getFileObject("org-netbeans-shortcuts-ShortcutAction.shadow");
+                final FileObject newAction = actionsFolder.getFileObject("org-jmarsault-shortcuts-ShortcutAction.shadow");
                 if (null != newAction) {
                     newAction.delete();
                 }

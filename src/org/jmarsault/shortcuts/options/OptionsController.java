@@ -7,7 +7,7 @@ import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
 @OptionsPanelController.SubRegistration(location = "Advanced",
-id = "org.netbeans.shortcuts.options.Shortcut",
+id = "org.jmarsault.shortcuts.options.Shortcut",
 displayName = "#AdvancedOption_DisplayName_Shortcut",
 keywords = "#AdvancedOption_Keywords_Shortcuts",
 keywordsCategory = "Advanced/Shortcuts")

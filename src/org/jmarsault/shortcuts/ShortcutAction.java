@@ -18,7 +18,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.Presenter;
 
 @ActionID(category = "File",
-id = "org.netbeans.shortcuts.ShortcutAction")
+id = "org.jmarsault.shortcuts.ShortcutAction")
 @ActionRegistration(displayName = "#CTL_ShortcutAction")
 @ActionReferences({
     @ActionReference(path = "Shortcuts", name = "OS-R"),
@@ -132,7 +132,7 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                OptionsDisplayer.getDefault().open(OptionsDisplayer.ADVANCED + "/org.netbeans.shortcuts.options.Shortcut");
+                OptionsDisplayer.getDefault().open(OptionsDisplayer.ADVANCED + "/org.jmarsault.shortcuts.options.Shortcut");
             }
         });
         jComponent.add(menuItem);
