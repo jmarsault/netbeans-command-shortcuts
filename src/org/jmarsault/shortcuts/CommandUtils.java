@@ -12,6 +12,8 @@ import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.text.JTextComponent;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.cookies.EditorCookie;
@@ -24,35 +26,60 @@ import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
+import org.netbeans.api.queries.FileEncodingQuery;
+import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 import org.openide.windows.TopComponent;
 
 public class CommandUtils {
 
     private static final Logger logger = Logger.getLogger(CommandUtils.class.getName());
+    private static final InputOutput io = IOProvider.getDefault().getIO(NbBundle.getMessage(CommandUtils.class, "TITLE_output"), false);
     private static final String UNIX_SEPARATOR = "/";
     private static final String WINDOWS_ESCAPED_SEPARATOR = "\\";
 
-    public static void exec(String command) {
-        StringWriter infos = new StringWriter();
-        StringWriter errors = new StringWriter();
+    public static void exec(final String inputCommand) {
+        CommandUtils.exec(null, inputCommand);
+    }
 
-        try {
-            command = parse(command);
-            Runtime runtime = Runtime.getRuntime();
+    public static void exec(final String commandName, final String inputCommand) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            @Override
+            public void run() {
+                ProgressHandle handle = ProgressHandleFactory.createSystemHandle(commandName);
+                StringWriter infos = new StringWriter();
+                StringWriter errors = new StringWriter();
 
-            Process process = runtime.exec(command);
+                try {
+                    handle.start();
+                    String parsedCommand = parse(inputCommand);
+                    Runtime runtime = Runtime.getRuntime();
 
-            ProcessStream outputStream = new ProcessStream(process.getInputStream(), new PrintWriter(infos, true));
-            ProcessStream errorStream = new ProcessStream(process.getErrorStream(), new PrintWriter(errors, true));
-            outputStream.start();
-            errorStream.start();
-            if (process.exitValue() > 0) {
-                //TODO: an error occured...
-                logger.log(Level.WARNING, errors.getBuffer().toString());
+                    Process process = runtime.exec(parsedCommand);
+
+                    ProcessStream outputStream = new ProcessStream(process.getInputStream(), new PrintWriter(infos, true));
+                    ProcessStream errorStream = new ProcessStream(process.getErrorStream(), new PrintWriter(errors, true));
+                    outputStream.start();
+                    errorStream.start();
+
+                    int exitVal = process.waitFor();
+
+                    if (exitVal > 0) {
+                        io.setFocusTaken(true);
+                        io.getErr().println(errors.getBuffer().toString());
+                        logger.log(Level.WARNING, errors.getBuffer().toString());
+                    }
+                } catch (InterruptedException ex) {
+                    logger.log(Level.WARNING, ex.getMessage());
+                } catch (IOException ex) {
+                    logger.log(Level.WARNING, ex.getMessage());
+                } finally {
+                    handle.finish();
+                }
             }
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+        });
     }
 
     public static String parse(String cmd) {
@@ -265,7 +292,7 @@ public class CommandUtils {
         public void run() {
             BufferedReader br = null;
             try {
-                br = new BufferedReader(new InputStreamReader(in));
+                br = new BufferedReader(new InputStreamReader(in, FileEncodingQuery.getDefaultEncoding()));
                 String line = null;
                 while ((line = br.readLine()) != null) {
                     pw.println(line);

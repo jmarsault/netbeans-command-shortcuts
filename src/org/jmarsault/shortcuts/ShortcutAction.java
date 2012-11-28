@@ -120,7 +120,7 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
                 @Override
                 public void actionPerformed(ActionEvent evt) {
                     JMenuItem menuItem = (JMenuItem) evt.getSource();
-                    evt.setSource(menuItem.getActionCommand());
+                    evt.setSource(shortcut.getKey());
                     btnShortcutActionPerformed(evt);
                 }
             });
@@ -146,7 +146,7 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
             btn.getActionMap().put(shortcut.getValue(), new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    e.setSource(shortcut.getValue());
+                    e.setSource(shortcut.getKey());
                     btnShortcutActionPerformed(e);
                 }
             });
@@ -154,7 +154,9 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
     }
 
     private void btnShortcutActionPerformed(ActionEvent evt) {
-        CommandUtils.exec((String) evt.getSource());
+        String commandName = (String) evt.getSource();
+        String command = settings.getShortcuts().get(commandName);
+        CommandUtils.exec(commandName, command);
     }
 
     private Icon getSystemIcon(File app) {
