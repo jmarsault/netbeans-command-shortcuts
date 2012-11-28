@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JEditorPane;
@@ -26,6 +28,7 @@ import org.openide.windows.TopComponent;
 
 public class CommandUtils {
 
+    private static final Logger logger = Logger.getLogger(CommandUtils.class.getName());
     private static final String UNIX_SEPARATOR = "/";
     private static final String WINDOWS_ESCAPED_SEPARATOR = "\\";
 
@@ -43,7 +46,10 @@ public class CommandUtils {
             ProcessStream errorStream = new ProcessStream(process.getErrorStream(), new PrintWriter(errors, true));
             outputStream.start();
             errorStream.start();
-
+            if (process.exitValue() > 0) {
+                //TODO: an error occured...
+                logger.log(Level.WARNING, errors.getBuffer().toString());
+            }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -198,7 +204,7 @@ public class CommandUtils {
 
 
         if (Utilities.isWindows()) {
-            cmd = "cmd.exe /C " + cmd;
+            cmd = "cmd.exe /C \"" + cmd + "\"";
         }
 
         return cmd;
