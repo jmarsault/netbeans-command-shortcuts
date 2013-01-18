@@ -23,6 +23,14 @@ import org.openide.util.Utilities;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.openide.windows.TopComponent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import org.netbeans.api.extexecution.ExecutionDescriptor;
+import org.netbeans.api.extexecution.ExecutionService;
 
 public class CommandUtils {
 
@@ -30,20 +38,25 @@ public class CommandUtils {
     private static final String WINDOWS_ESCAPED_SEPARATOR = "\\";
 
     public static void exec(String command) {
-        StringWriter infos = new StringWriter();
-        StringWriter errors = new StringWriter();
-
         try {
             command = parse(command);
+            String name = command.split(" ")[0];
             Runtime runtime = Runtime.getRuntime();
+            final Process process = runtime.exec(command);
+            
+            Callable processCallable = new Callable() {
 
-            Process process = runtime.exec(command);
-
-            ProcessStream outputStream = new ProcessStream(process.getInputStream(), new PrintWriter(infos, true));
-            ProcessStream errorStream = new ProcessStream(process.getErrorStream(), new PrintWriter(errors, true));
-            outputStream.start();
-            errorStream.start();
-
+                @Override
+                public Process call() throws IOException {
+                    return process;
+                }
+            };
+            
+            ExecutionDescriptor descriptor = new ExecutionDescriptor().frontWindow(true).controllable(true);
+            
+            ExecutionService service = ExecutionService.newService(processCallable, descriptor, name);
+            
+            Future task = service.run();          
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
