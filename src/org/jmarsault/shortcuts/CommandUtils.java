@@ -40,6 +40,7 @@ public class CommandUtils {
     public static void exec(String command) {
         try {
             command = parse(command);
+	    // Show something as Outputwindow Caption
             String name = command.split(" ")[0];
             Runtime runtime = Runtime.getRuntime();
             final Process process = runtime.exec(command);
