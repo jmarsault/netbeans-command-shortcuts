@@ -4,16 +4,12 @@ import java.awt.Component;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.cookies.EditorCookie;
@@ -26,11 +22,6 @@ import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
-import org.netbeans.api.queries.FileEncodingQuery;
-import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
 import org.openide.windows.TopComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,19 +31,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.ExecutionService;
+import org.netbeans.api.queries.FileEncodingQuery;
 
 public class CommandUtils {
 
-    private static final Logger logger = Logger.getLogger(CommandUtils.class.getName());
-    private static final InputOutput io = IOProvider.getDefault().getIO(NbBundle.getMessage(CommandUtils.class, "TITLE_output"), false);
     private static final String UNIX_SEPARATOR = "/";
     private static final String WINDOWS_ESCAPED_SEPARATOR = "\\";
 
-    public static void exec(String command) {
+    public static void exec(String name, String command) {
         try {
             command = parse(command);
 	    // Show something as Outputwindow Caption
-            String name = command.split(" ")[0];
+            //String name = command.split(" ")[0];
             Runtime runtime = Runtime.getRuntime();
             final Process process = runtime.exec(command);
             

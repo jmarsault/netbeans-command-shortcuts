@@ -82,7 +82,8 @@ public class RunPanel extends javax.swing.JPanel {
         String newCommand = (String) cbCommand.getEditor().getItem();
         if (newCommand != null) {
             settings.addCommand(newCommand);
-            CommandUtils.exec(newCommand);
+            String name = newCommand.split(" ")[0];
+            CommandUtils.exec(name, newCommand);
         }
     }
 
