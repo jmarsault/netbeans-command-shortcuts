@@ -2,13 +2,11 @@ package org.jmarsault.shortcuts;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.prefs.Preferences;
 import javax.swing.KeyStroke;
-import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
+import org.netbeans.core.options.keymap.api.*;
 
 final public class ShortcutSettings {
 
@@ -19,8 +17,6 @@ final public class ShortcutSettings {
     private LinkedList<String> commands = new LinkedList<String>();
     private PropertyChangeSupport propertySupport;
     private static ShortcutSettings shortcutSettings = null;
-    private Method getKeyStroke;
-    private Class UtilsClass;
 
     /**
      * Creates a new instance of Settings
@@ -28,19 +24,6 @@ final public class ShortcutSettings {
     private ShortcutSettings() {
         shortcutNames.addAll(decodePatterns(getPreferences().get(PROP_SHORTCUT_NAMES, "")));
         commands.addAll(decodePatterns(getPreferences().get(PROP_COMMAND_LIST, "")));
-        ClassLoader l = Thread.currentThread().getContextClassLoader();
-        try {
-            UtilsClass = l.loadClass("org.netbeans.modules.options.keymap.Utils");
-            getKeyStroke = UtilsClass.getDeclaredMethod("getKeyStroke", new Class<?>[]{String.class});
-        } catch (NoSuchMethodException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (SecurityException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (ClassNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        getKeyStroke.setAccessible(true);
-
     }
 
     public static synchronized ShortcutSettings getDefault() {
@@ -134,16 +117,7 @@ final public class ShortcutSettings {
 
     public KeyStroke getKeyStroke(String name) {
         String shortcut = getPreferences().get("keystroke_" + name, "");
-        KeyStroke keystroke = null;
-        try {
-            keystroke = (KeyStroke) getKeyStroke.invoke(UtilsClass, new Object[]{shortcut});
-        } catch (IllegalAccessException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IllegalArgumentException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (InvocationTargetException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+        KeyStroke keystroke = KeyStrokeUtils.getKeyStroke(shortcut);
         return keystroke;
     }
 

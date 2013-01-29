@@ -9,8 +9,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -28,6 +26,7 @@ import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.netbeans.core.options.keymap.api.*;
 
 class OptionsPanel extends javax.swing.JPanel {
 
@@ -38,7 +37,6 @@ class OptionsPanel extends javax.swing.JPanel {
         initComponents();
         tblCommand.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCommand.addPropertyChangeListener(new PropertyChangeListener() {
-
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
 
@@ -47,7 +45,6 @@ class OptionsPanel extends javax.swing.JPanel {
                     final TableCellEditor editor = tblCommand.getCellEditor();
                     if (editor != null) {
                         editor.addCellEditorListener(new CellEditorListener() {
-
                             @Override
                             public void editingStopped(ChangeEvent e) {
                                 editor.removeCellEditorListener(this);
@@ -66,7 +63,6 @@ class OptionsPanel extends javax.swing.JPanel {
             }
         });
         tblCommand.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2
@@ -81,7 +77,6 @@ class OptionsPanel extends javax.swing.JPanel {
             }
         });
         tblCommand.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 enableButtons();
@@ -90,7 +85,6 @@ class OptionsPanel extends javax.swing.JPanel {
         });
 
         edtCommand.addKeyListener(new KeyAdapter() {
-
             @Override
             public void keyPressed(KeyEvent e) {
                 if (KeyEvent.VK_ENTER == e.getKeyCode()) {
@@ -103,7 +97,6 @@ class OptionsPanel extends javax.swing.JPanel {
         edtCommand.setEnabled(false);
         edtCommand.setEditorKit(JEditorPane.createEditorKitForContentType("text/plain")); //NOI18N
         edtCommand.getDocument().addDocumentListener(new DocumentListener() {
-
             public void insertUpdate(DocumentEvent e) {
                 edtCommandDocumentChanged();
             }
@@ -451,19 +444,12 @@ private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     // End of variables declaration//GEN-END:variables
 
     public void showShortcutsDialog() throws IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException,
+            IllegalArgumentException,
             NoSuchMethodException, ClassNotFoundException {
-        //Hack
-        ClassLoader l = Thread.currentThread().getContextClassLoader();
-        Class shortcutsFinderClass = l.loadClass("org.netbeans.core.options.keymap.api.ShortcutsFinder");
 
-        Object shortcutsFinder = Lookup.getDefault().lookup(shortcutsFinderClass);
-
-        Method refreshActions = shortcutsFinderClass.getMethod("refreshActions");
-        refreshActions.invoke(shortcutsFinder);
-
-        Method showShortcutsDialog = shortcutsFinderClass.getMethod("showShortcutsDialog");
-        String shortcut = (String) showShortcutsDialog.invoke(shortcutsFinder);
+        ShortcutsFinder shortcutsFinder = Lookup.getDefault().lookup(ShortcutsFinder.class);
+        assert shortcutsFinder != null : "Can't find ShortcutsFinder"; //NOI18N
+        String shortcut = shortcutsFinder.showShortcutsDialog();
 
         if (shortcut != null) {
             DefaultTableModel model = (DefaultTableModel) tblCommand.getModel();
