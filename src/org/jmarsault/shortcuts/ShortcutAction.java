@@ -18,9 +18,10 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.Presenter;
 
 @ActionID(category = "File",
-id = "org.jmarsault.shortcuts.ShortcutAction")
+        id = "org.jmarsault.shortcuts.ShortcutAction")
 @ActionRegistration(displayName = "#CTL_ShortcutAction")
 @ActionReferences({
+    @ActionReference(path = "UI/ToolActions/Files", position = 1001),
     @ActionReference(path = "Shortcuts", name = "OS-R"),
     @ActionReference(path = "Toolbars/Shortcut", position = -100)
 })

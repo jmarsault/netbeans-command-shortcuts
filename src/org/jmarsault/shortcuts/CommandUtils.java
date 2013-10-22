@@ -23,11 +23,8 @@ import org.openide.util.Utilities;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.openide.windows.TopComponent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.ExecutionService;
@@ -40,12 +37,12 @@ public class CommandUtils {
 
     public static void exec(String name, String command) {
         try {
-            command = parse(command);
-	    // Show something as Outputwindow Caption
+            String[] commandArray = parse(command);
+            // Show something as Outputwindow Caption
             //String name = command.split(" ")[0];
             Runtime runtime = Runtime.getRuntime();
-            final Process process = runtime.exec(command);
-            
+            final Process process = runtime.exec(commandArray);
+
             Callable processCallable = new Callable() {
 
                 @Override
@@ -53,18 +50,18 @@ public class CommandUtils {
                     return process;
                 }
             };
-            
+
             ExecutionDescriptor descriptor = new ExecutionDescriptor().frontWindow(true).controllable(true);
-            
+
             ExecutionService service = ExecutionService.newService(processCallable, descriptor, name);
-            
-            Future task = service.run();          
+
+            Future task = service.run();
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
     }
 
-    public static String parse(String cmd) {
+    public static String[] parse(String cmd) {
         DataObject dobj = Utilities.actionsGlobalContext().lookup(DataObject.class);
         TopComponent activated = TopComponent.getRegistry().getActivated();
 
@@ -134,7 +131,6 @@ public class CommandUtils {
                     }
                 }
             }
-
 
             if ("input".equalsIgnoreCase(var)) {
                 NotifyDescriptor.InputLine msg = new NotifyDescriptor.InputLine("Input", "");
@@ -211,12 +207,12 @@ public class CommandUtils {
             }
         }
 
-
+        String[] cmdArray = new String[]{cmd};
         if (Utilities.isWindows()) {
-            cmd = "cmd.exe /C \"" + cmd + "\"";
+            cmdArray = new String[]{"cmd", "/C", cmd};
         }
 
-        return cmd;
+        return cmdArray;
     }
 
     private static String normalize(String path) {
