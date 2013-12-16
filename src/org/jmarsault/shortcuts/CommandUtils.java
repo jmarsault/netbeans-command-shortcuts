@@ -35,13 +35,13 @@ public class CommandUtils {
     private static final String UNIX_SEPARATOR = "/";
     private static final String WINDOWS_ESCAPED_SEPARATOR = "\\";
 
-    public static void exec(String name, String command) {
+    public static void exec(String name, String cmd) {
         try {
-            String[] commandArray = parse(command);
+            String command = parse(cmd);
             // Show something as Outputwindow Caption
             //String name = command.split(" ")[0];
             Runtime runtime = Runtime.getRuntime();
-            final Process process = runtime.exec(commandArray);
+            final Process process = runtime.exec(command);
 
             Callable processCallable = new Callable() {
 
@@ -61,7 +61,7 @@ public class CommandUtils {
         }
     }
 
-    public static String[] parse(String cmd) {
+    public static String parse(String cmd) {
         DataObject dobj = Utilities.actionsGlobalContext().lookup(DataObject.class);
         TopComponent activated = TopComponent.getRegistry().getActivated();
 
@@ -190,7 +190,7 @@ public class CommandUtils {
 //                                Class outputTabClass = l.loadClass("org.netbeans.core.output2.OutputTab");
 //                                Method getOutputPane = outputTabClass.getMethod("getOutputPane");
 //                                Object abstractOutputPaneClass = (Object) getOutputPane.invoke(component);
-//                                
+//
 //                                Method getSelectedText = abstractOutputPaneClass.getClass().getMethod("getSelectedText");
 //                                String selection = (String) getSelectedText.invoke(abstractOutputPaneClass);
 //                                Document doc;
@@ -207,12 +207,13 @@ public class CommandUtils {
             }
         }
 
-        String[] cmdArray = new String[]{cmd};
+//        String[] cmdArray = new String[]{cmd};
         if (Utilities.isWindows()) {
-            cmdArray = new String[]{"cmd", "/C", cmd};
+//            cmdArray = new String[]{"cmd", "/C", cmd};
+          cmd = "cmd /C " + cmd;
         }
 
-        return cmdArray;
+        return cmd;
     }
 
     private static String normalize(String path) {
