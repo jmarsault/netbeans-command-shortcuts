@@ -42,12 +42,10 @@
     <Component class="javax.swing.JComboBox" name="cbCommand">
       <Properties>
         <Property name="editable" type="boolean" value="true"/>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new javax.swing.DefaultComboBoxModel(previousCommands)" type="code"/>
-        </Property>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="final JTextComponent editor = (JTextComponent) cbCommand.getEditor().getEditorComponent();&#xa;editor.setDocument(new AutocompleteDoc(cbCommand));&#xa;SwingUtilities.invokeLater(new Runnable() {&#xa;&#xa;            public void run() {&#xa;                editor.selectAll();&#xa;cbCommand.requestFocus();&#xa;            }&#xa;        });"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btnBrowse">

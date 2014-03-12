@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.jmarsault.shortcuts
-OpenIDE-Module-Implementation-Version: 6
+OpenIDE-Module-Implementation-Version: 9
 OpenIDE-Module-Localizing-Bundle: org/jmarsault/shortcuts/Bundle.properties
 

@@ -16,12 +16,14 @@ import org.openide.util.NbBundle;
 
 public class RunPanel extends javax.swing.JPanel {
 
+    private static final long serialVersionUID = 1L;
+
     private final ShortcutSettings settings;
-    private final Object[] previousCommands;
+//    private final Object[] previousCommands;
 
     public RunPanel() {
         settings = ShortcutSettings.getDefault();
-        previousCommands = settings.getCommands().toArray();
+//        previousCommands = settings.getCommands().toArray();
         initComponents();
     }
 
@@ -34,7 +36,7 @@ public class RunPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        cbCommand = new javax.swing.JComboBox();
+        cbCommand = new javax.swing.JComboBox<String>();
         final JTextComponent editor = (JTextComponent) cbCommand.getEditor().getEditorComponent();
         editor.setDocument(new AutocompleteDoc(cbCommand));
         SwingUtilities.invokeLater(new Runnable() {
@@ -47,7 +49,6 @@ public class RunPanel extends javax.swing.JPanel {
         btnBrowse = new javax.swing.JButton();
 
         cbCommand.setEditable(true);
-        cbCommand.setModel(new javax.swing.DefaultComboBoxModel(previousCommands));
 
         btnBrowse.setText(org.openide.util.NbBundle.getMessage(RunPanel.class, "RunPanel.btnBrowse.text")); // NOI18N
         btnBrowse.addActionListener(new java.awt.event.ActionListener() {
@@ -121,16 +122,17 @@ public class RunPanel extends javax.swing.JPanel {
                 Exceptions.printStackTrace(ex);
             }
 
-
         }
     }//GEN-LAST:event_btnBrowseActionPerformed
 
     public class AutocompleteDoc extends PlainDocument {
 
-        private JComboBox comboBox;
+        private static final long serialVersionUID = 1L;
+
+        private final JComboBox<String> comboBox;
         private boolean selecting = false;
 
-        public AutocompleteDoc(final JComboBox comboBox) {
+        public AutocompleteDoc(final JComboBox<String> comboBox) {
             this.comboBox = comboBox;
         }
 
@@ -160,7 +162,6 @@ public class RunPanel extends javax.swing.JPanel {
                     super.remove(0, getLength());
                     super.insertString(0, item.toString(), a);
                 }
-
 
                 JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
                 editor.setSelectionStart(offs + str.length());
@@ -195,6 +196,6 @@ public class RunPanel extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBrowse;
-    private javax.swing.JComboBox cbCommand;
-    // End of variables declaration//GEN-END:variables
+    private javax.swing.JComboBox<String> cbCommand;
+    // End of variables declaration                   //GEN-END:variables
 }
