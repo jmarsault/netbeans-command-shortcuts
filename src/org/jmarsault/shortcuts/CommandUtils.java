@@ -211,6 +211,10 @@ public class CommandUtils {
         if (Utilities.isWindows()) {
             cmdArray = new String[]{"cmd", "/C", cmd};
         }
+        else
+          if (Utilities.isUnix ()) {
+              cmdArray = new String[]{"/bin/sh", "-c", cmd};
+          }
 
         return cmdArray;
     }
