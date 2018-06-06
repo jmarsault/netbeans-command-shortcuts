@@ -127,7 +127,7 @@ public class RunPanel extends javax.swing.JPanel {
 
     public class AutocompleteDoc extends PlainDocument {
 
-        private JComboBox comboBox;
+        private final JComboBox comboBox;
         private boolean selecting = false;
 
         public AutocompleteDoc(final JComboBox comboBox) {

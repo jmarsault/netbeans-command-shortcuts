@@ -13,8 +13,8 @@ final public class ShortcutSettings {
     public static final String PROP_SHORTCUT_NAMES = "shortcutList";
     public static final String PROP_COMMAND_LIST = "commandList";
     private static final String SHORTCUT_DELIMITER = "§";
-    private List<String> shortcutNames = new ArrayList<String>();
-    private LinkedList<String> commands = new LinkedList<String>();
+    private final List<String> shortcutNames = new ArrayList<>();
+    private final LinkedList<String> commands = new LinkedList<>();
     private PropertyChangeSupport propertySupport;
     private static ShortcutSettings shortcutSettings = null;
 
@@ -34,11 +34,11 @@ final public class ShortcutSettings {
     }
 
     public Map<String, String> getShortcuts() {
-        Map<String, String> newShortcuts = new LinkedHashMap<String, String>();
-        for (String name : shortcutNames) {
-            String cmd = getPreferences().get(name, "");
-            newShortcuts.put(name, cmd);
-        }
+        Map<String, String> newShortcuts = new LinkedHashMap<>();
+        shortcutNames.forEach((name) -> {
+          String cmd = getPreferences().get(name, "");
+          newShortcuts.put(name, cmd);
+      });
         return Collections.unmodifiableMap(newShortcuts);
     }
 
@@ -46,9 +46,9 @@ final public class ShortcutSettings {
         shortcutNames.clear();
         shortcutNames.addAll(newShortcuts.keySet());
         getPreferences().put(PROP_SHORTCUT_NAMES, encodeCommands(newShortcuts.keySet()));
-        for (Map.Entry<String, String> shortcut : newShortcuts.entrySet()) {
-            getPreferences().put(shortcut.getKey(), shortcut.getValue());
-        }
+        newShortcuts.entrySet().forEach((shortcut) -> {
+          getPreferences().put(shortcut.getKey(), shortcut.getValue());
+      });
 
         if (null == propertySupport) {
             propertySupport = new PropertyChangeSupport(this);
@@ -103,11 +103,11 @@ final public class ShortcutSettings {
     }
 
     public Map<String, String> getKeystrokeShortcuts() {
-        Map<String, String> shortcuts = new LinkedHashMap<String, String>();
-        for (String name : shortcutNames) {
-            String cmd = getPreferences().get("keystroke_" + name, "");
-            shortcuts.put(name, cmd);
-        }
+        Map<String, String> shortcuts = new LinkedHashMap<>();
+        shortcutNames.forEach((name) -> {
+          String cmd = getPreferences().get("keystroke_" + name, "");
+          shortcuts.put(name, cmd);
+      });
         return Collections.unmodifiableMap(shortcuts);
     }
 
@@ -122,9 +122,9 @@ final public class ShortcutSettings {
     }
 
     public void setKeystrokeShortcuts(Map<String, String> keystrokes) {
-        for (Map.Entry<String, String> keystroke : keystrokes.entrySet()) {
-            getPreferences().put("keystroke_" + keystroke.getKey(), keystroke.getValue());
-        }
+      keystrokes.entrySet().forEach((keystroke) -> {
+        getPreferences().put("keystroke_" + keystroke.getKey(), keystroke.getValue());
+      });
 
         if (null == propertySupport) {
             propertySupport = new PropertyChangeSupport(this);
@@ -168,7 +168,7 @@ final public class ShortcutSettings {
     private static Collection<String> decodePatterns(String encodedPatterns) {
         StringTokenizer st = new StringTokenizer(encodedPatterns, SHORTCUT_DELIMITER, false);
 
-        Collection<String> patterns = new ArrayList<String>();
+        Collection<String> patterns = new ArrayList<>();
 
         while (st.hasMoreTokens()) {
             String im = st.nextToken();
@@ -181,10 +181,12 @@ final public class ShortcutSettings {
     private static String encodeCommands(Collection<String> patterns) {
         StringBuilder sb = new StringBuilder();
 
-        for (String p : patterns) {
-            sb.append(p);
-            sb.append(SHORTCUT_DELIMITER);
-        }
+        patterns.stream().map((p) -> {
+          sb.append(p);
+        return p;
+      }).forEachOrdered((_item) -> {
+        sb.append(SHORTCUT_DELIMITER);
+      });
 
         return sb.toString();
     }

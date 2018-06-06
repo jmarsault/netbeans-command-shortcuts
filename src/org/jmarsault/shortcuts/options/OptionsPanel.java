@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -18,7 +17,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.BadLocationException;
@@ -31,36 +29,32 @@ import org.netbeans.core.options.keymap.api.*;
 class OptionsPanel extends javax.swing.JPanel {
 
     private boolean changed = false;
-    private ShortcutSettings settings;
+    private final ShortcutSettings settings;
 
     public OptionsPanel() {
         initComponents();
         tblCommand.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblCommand.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-
-                if ("tableCellEditor".equals(evt.getPropertyName())) {
-                    final boolean wasChanged = changed;
-                    final TableCellEditor editor = tblCommand.getCellEditor();
-                    if (editor != null) {
-                        editor.addCellEditorListener(new CellEditorListener() {
-                            @Override
-                            public void editingStopped(ChangeEvent e) {
-                                editor.removeCellEditorListener(this);
-                                changed = true;
-                                firePropertyChange(OptionsPanelController.PROP_CHANGED, new Boolean(wasChanged), Boolean.TRUE);
-                                firePropertyChange(OptionsPanelController.PROP_VALID, null, null);
-                            }
-
-                            @Override
-                            public void editingCanceled(ChangeEvent e) {
-                                editor.removeCellEditorListener(this);
-                            }
-                        });
-                    }
+        tblCommand.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+          if ("tableCellEditor".equals(evt.getPropertyName())) {
+            final boolean wasChanged = changed;
+            final TableCellEditor editor = tblCommand.getCellEditor();
+            if (editor != null) {
+              editor.addCellEditorListener(new CellEditorListener() {
+                @Override
+                public void editingStopped(ChangeEvent e) {
+                  editor.removeCellEditorListener(this);
+                  changed = true;
+                  firePropertyChange(OptionsPanelController.PROP_CHANGED, Boolean.valueOf(wasChanged), Boolean.TRUE);
+                  firePropertyChange(OptionsPanelController.PROP_VALID, null, null);
                 }
+                
+                @Override
+                public void editingCanceled(ChangeEvent e) {
+                  editor.removeCellEditorListener(this);
+                }
+              });
             }
+          }
         });
         tblCommand.addMouseListener(new MouseAdapter() {
             @Override
@@ -69,19 +63,16 @@ class OptionsPanel extends javax.swing.JPanel {
                         && tblCommand.getSelectedColumn() == 1) {
                     try {
                         showShortcutsDialog();
-                    } catch (Exception ex) {
+                    } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 }
 
             }
         });
-        tblCommand.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                enableButtons();
-                commandValueChanged(e);
-            }
+        tblCommand.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+          enableButtons();
+          commandValueChanged(e);
         });
 
         edtCommand.addKeyListener(new KeyAdapter() {
@@ -97,14 +88,17 @@ class OptionsPanel extends javax.swing.JPanel {
         edtCommand.setEnabled(false);
         edtCommand.setEditorKit(JEditorPane.createEditorKitForContentType("text/plain")); //NOI18N
         edtCommand.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 edtCommandDocumentChanged();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 edtCommandDocumentChanged();
             }
 
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 // ignore
             }
@@ -158,8 +152,8 @@ class OptionsPanel extends javax.swing.JPanel {
     void applyChanges() {
         DefaultTableModel model = (DefaultTableModel) tblCommand.getModel();
 
-        Map<String, String> commands = new LinkedHashMap<String, String>();
-        Map<String, String> shortcuts = new LinkedHashMap<String, String>();
+        Map<String, String> commands = new LinkedHashMap<>();
+        Map<String, String> shortcuts = new LinkedHashMap<>();
 
         for (int i = 0; i < model.getRowCount(); i++) {
             String name = (String) model.getValueAt(i, 0);
@@ -175,7 +169,7 @@ class OptionsPanel extends javax.swing.JPanel {
 
     boolean isDataValid() {
         DefaultTableModel model = (DefaultTableModel) tblCommand.getModel();
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
 
         for (int i = 0; i < model.getRowCount(); i++) {
             String name = (String) model.getValueAt(i, 0);
@@ -387,7 +381,7 @@ private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 //    changed = true;
 //    firePropertyChange(OptionsPanelController.PROP_CHANGED, new Boolean(wasChanged), Boolean.TRUE);
 //
-    firePropertyChange(OptionsPanelController.PROP_VALID, new Boolean(wasValid), new Boolean(isDataValid()));
+    firePropertyChange(OptionsPanelController.PROP_VALID, Boolean.valueOf(wasValid), Boolean.valueOf(isDataValid()));
 }//GEN-LAST:event_btnRemoveActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
@@ -408,7 +402,7 @@ private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private void btnSetShortcutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetShortcutActionPerformed
         try {
             showShortcutsDialog();
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException ex) {
             Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_btnSetShortcutActionPerformed
@@ -459,6 +453,7 @@ private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
     private class MyTable extends JTable {
 
+        @Override
         public boolean isCellEditable(int row, int column) {
             return column != 1;
         }

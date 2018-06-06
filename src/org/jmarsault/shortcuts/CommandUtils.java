@@ -24,8 +24,8 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.openide.windows.TopComponent;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.ExecutionService;
 import org.netbeans.api.queries.FileEncodingQuery;
@@ -43,19 +43,13 @@ public class CommandUtils {
             Runtime runtime = Runtime.getRuntime();
             final Process process = runtime.exec(commandArray);
 
-            Callable processCallable = new Callable() {
-
-                @Override
-                public Process call() throws IOException {
-                    return process;
-                }
-            };
+            Callable<Process> processCallable = (Callable<Process>) () -> process;
 
             ExecutionDescriptor descriptor = new ExecutionDescriptor().frontWindow(true).controllable(true);
 
             ExecutionService service = ExecutionService.newService(processCallable, descriptor, name);
 
-            Future task = service.run();
+            service.run();
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -74,7 +68,7 @@ public class CommandUtils {
                 }
             }
         }
-        Collection<? extends Node> nodez = Utilities.actionsGlobalContext().lookup(new Lookup.Template<Node>(Node.class)).allInstances();
+        Collection<? extends Node> nodez = Utilities.actionsGlobalContext().lookup(new Lookup.Template<>(Node.class)).allInstances();
         Node[] nodes = nodez.toArray(new Node[nodez.size()]);
         Pattern pVar = Pattern.compile("#\\{([a-zA-Z]+[0-9]*)\\}");
         Matcher mVar = pVar.matcher(cmd);
@@ -166,7 +160,7 @@ public class CommandUtils {
                             ClassLoader l = Thread.currentThread().getContextClassLoader();
                             Class outputTabClass = l.loadClass("org.netbeans.core.output2.OutputTab");
                             Method getOutputPane = outputTabClass.getMethod("getOutputPane");
-                            Object abstractOutputPaneClass = (Object) getOutputPane.invoke(component);
+                            Object abstractOutputPaneClass = getOutputPane.invoke(component);
 
                             Method getSelectedText = abstractOutputPaneClass.getClass().getMethod("getSelectedText");
                             String selection = (String) getSelectedText.invoke(abstractOutputPaneClass);
@@ -174,7 +168,7 @@ public class CommandUtils {
                             if (selection != null) {
                                 cmd = cmd.replace("#{" + var + "}", selection);
                             }
-                        } catch (Exception ex) {
+                        } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
                             Exceptions.printStackTrace(ex);
                         }
 
@@ -227,14 +221,14 @@ public class CommandUtils {
     }
 
     static FileObject getFileFromNode(Node node) {
-        FileObject fo = (FileObject) node.getLookup().lookup(FileObject.class);
+        FileObject fo = node.getLookup().lookup(FileObject.class);
         if (fo == null) {
-            Project p = (Project) node.getLookup().lookup(Project.class);
+            Project p = node.getLookup().lookup(Project.class);
             if (p != null) {
                 return p.getProjectDirectory();
             }
 
-            DataObject dobj = (DataObject) node.getCookie(DataObject.class);
+            DataObject dobj = node.getCookie(DataObject.class);
             if (dobj instanceof DataShadow) {
                 dobj = ((DataShadow) dobj).getOriginal();
             }
@@ -262,8 +256,8 @@ public class CommandUtils {
 
     static class ProcessStream extends Thread {
 
-        private InputStream in;
-        private PrintWriter pw;
+        private final InputStream in;
+        private final PrintWriter pw;
 
         ProcessStream(InputStream in, PrintWriter pw) {
             this.in = in;
@@ -275,11 +269,11 @@ public class CommandUtils {
             BufferedReader br = null;
             try {
                 br = new BufferedReader(new InputStreamReader(in, FileEncodingQuery.getDefaultEncoding()));
-                String line = null;
+                String line;
                 while ((line = br.readLine()) != null) {
                     pw.println(line);
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Exceptions.printStackTrace(e);
             } finally {
                 try {

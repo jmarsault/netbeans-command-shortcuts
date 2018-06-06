@@ -3,11 +3,9 @@ package org.jmarsault.shortcuts;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Map;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import org.netbeans.api.options.OptionsDisplayer;
@@ -29,8 +27,8 @@ import org.openide.util.actions.Presenter;
 public final class ShortcutAction extends AbstractAction implements Presenter.Toolbar, Presenter.Popup, PropertyChangeListener {
 
     private static final String PREFERRED_ICON_SIZE = "PreferredIconSize";
-    private JButton toggleButton;
-    private JPopupMenu popup;
+    private final JButton toggleButton;
+    private final JPopupMenu popup;
     private final FileSystemView fileSystemView;
     private final ShortcutSettings settings;
     private final Icon ICON = new ImageIcon(ImageUtilities.loadImage("org/jmarsault/shortcuts/shortcut24.png"));
@@ -109,49 +107,45 @@ public final class ShortcutAction extends AbstractAction implements Presenter.To
 
     private void addItemsTo(JComponent jComponent) {
 
-        for (final Map.Entry<String, String> shortcut : settings.getShortcuts().entrySet()) {
-            File app = CommandUtils.getFirstApplicationFile(shortcut.getValue());
-            final JMenuItem menuItem = new JMenuItem();
-            menuItem.setText(shortcut.getKey());
-            menuItem.setToolTipText(shortcut.getValue());
-            menuItem.setIcon(getSystemIcon(app));
-            menuItem.setActionCommand(shortcut.getValue());
-            menuItem.setAccelerator(settings.getKeyStroke(shortcut.getKey()));
-            menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent evt) {
-                    JMenuItem menuItem = (JMenuItem) evt.getSource();
-                    evt.setSource(shortcut.getKey());
-                    btnShortcutActionPerformed(evt);
-                }
-            });
-
-            jComponent.add(menuItem);
-        }
+      settings.getShortcuts().entrySet().stream().map((shortcut) -> {
+        File app = CommandUtils.getFirstApplicationFile(shortcut.getValue());
+        final JMenuItem menuItem = new JMenuItem();
+        menuItem.setText(shortcut.getKey());
+        menuItem.setToolTipText(shortcut.getValue());
+        menuItem.setIcon(getSystemIcon(app));
+        menuItem.setActionCommand(shortcut.getValue());
+        menuItem.setAccelerator(settings.getKeyStroke(shortcut.getKey()));
+        menuItem.addActionListener((ActionEvent evt) -> {
+          JMenuItem menuItem1 = (JMenuItem) evt.getSource();
+          evt.setSource(shortcut.getKey());
+          btnShortcutActionPerformed(evt);
+        });
+        return menuItem;
+      }).forEachOrdered((menuItem) -> {
+        jComponent.add(menuItem);
+      });
         jComponent.add(new JSeparator());
         JMenuItem menuItem = new JMenuItem(NbBundle.getMessage(ShortcutAction.class, "lbl_option"));
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                OptionsDisplayer.getDefault().open(OptionsDisplayer.ADVANCED + "/org.jmarsault.shortcuts.options.Shortcut");
-            }
-        });
+        menuItem.addActionListener((ActionEvent evt) -> {
+          OptionsDisplayer.getDefault().open(OptionsDisplayer.ADVANCED + "/org.jmarsault.shortcuts.options.Shortcut");
+      });
         jComponent.add(menuItem);
     }
 
     private void addKeyStrokesTo(JButton btn) {
 
-        for (final Map.Entry<String, String> shortcut : settings.getShortcuts().entrySet()) {
-
-            btn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(settings.getKeyStroke(shortcut.getKey()), shortcut.getValue());
-            btn.getActionMap().put(shortcut.getValue(), new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    e.setSource(shortcut.getKey());
-                    btnShortcutActionPerformed(e);
-                }
-            });
-        }
+      settings.getShortcuts().entrySet().stream().map((shortcut) -> {
+        btn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(settings.getKeyStroke(shortcut.getKey()), shortcut.getValue());
+        return shortcut;
+      }).forEachOrdered((shortcut) -> {
+        btn.getActionMap().put(shortcut.getValue(), new AbstractAction() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            e.setSource(shortcut.getKey());
+            btnShortcutActionPerformed(e);
+          }
+        });
+      });
     }
 
     private void btnShortcutActionPerformed(ActionEvent evt) {

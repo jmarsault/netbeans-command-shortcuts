@@ -50,7 +50,7 @@ public class OptionsController extends OptionsPanelController {
 
     @Override
     public HelpCtx getHelpCtx() {
-        return new HelpCtx(OptionsController.class);
+        return new HelpCtx("org.jmarsault.shortcuts.options.OptionsController");
     }
 
     @Override
